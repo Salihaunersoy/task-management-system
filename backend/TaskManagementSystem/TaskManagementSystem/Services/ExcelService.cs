@@ -54,7 +54,7 @@ namespace TaskManagementSystem.Services
 							SheetData chartSheetData         = new SheetData();
 
 							chartWorksheet.Append(chartSheetData);
-							chartWorksheetPart.Worksheet = chartWorksheet;
+							chartWorksheetPart.Worksheet = chartWorksheet; 
 
 							sheets.Append(new Sheet()
 							{

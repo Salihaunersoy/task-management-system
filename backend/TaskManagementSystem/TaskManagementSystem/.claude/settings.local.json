@@ -1,0 +1,16 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(dotnet add:*)",
+      "Bash(dotnet build:*)",
+      "Bash(findstr:*)",
+      "Bash(taskkill:*)",
+      "Bash(cmd /c \"taskkill /F /PID 26984\")",
+      "Bash(cmd /c \"tasklist /FI \"\"PID eq 26984\"\"\")",
+      "Bash(cmd /c \"tasklist /FI \"\"IMAGENAME eq TaskManagementSystem.exe\"\"\")",
+      "Bash(powershell -Command:*)",
+      "Bash(ls -la \"C:\\\\Users\\\\excalibur\\\\Desktop\\\\task-management-system\\\\frontend\\\\task-management-ui\\\\src\\\\app\\\\admin-ui\"\" 2>&1 || echo \"Directory listing failed \")",
+      "Bash(dotnet run)"
+    ]
+  }
+}

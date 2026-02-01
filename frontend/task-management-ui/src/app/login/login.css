@@ -1,0 +1,103 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Segoe UI", Tahoma, sans-serif;
+}
+
+.container {
+    height: 100vh;
+    background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.login-container {
+    width: 40% !important;
+    height: 40%;
+    min-height: 500px;
+    padding: 40px;
+    border-radius: 20px;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+}
+
+.login-header {
+    text-align: center;
+    margin: 30px;
+}
+
+.login-header h1 {
+    color: #ffffff;
+    font-size: 28px;
+    margin-bottom: 6px;
+}
+
+.login-header p {
+    color: #cfd8dc;
+    font-size: 14px;
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column;
+}
+
+.login-email,
+.login-password {
+    margin-bottom: 18px;
+}
+
+.login-email label,
+.login-password label {
+    color: #e0e0e0;
+    font-size: 14px;
+    margin-bottom: 6px;
+}
+
+.login-email input,
+.login-password input {
+    width: 100%;
+    padding: 14px;
+    border-radius: 10px;
+    border: none;
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+}
+
+.login-email input::placeholder,
+.login-password input::placeholder {
+    color: #d0d0d0;
+}
+
+.login-email input:focus,
+.login-password input:focus {
+    outline: 2px solid #00bcd4;
+    background: rgba(255, 255, 255, 0.25);
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    border-radius: 12px;
+    border: none;
+    background: #00bcd4;
+    color: #ffffff;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: 0.3s ease;
+    margin-top: 6px;
+}
+
+.login-footer {
+    text-align: center;
+    font-size: 16px;
+    color: #b0bec5;
+}
+
+.errorMsg{
+    margin-top: 5px;
+    color: rgb(198, 80, 80);
+}

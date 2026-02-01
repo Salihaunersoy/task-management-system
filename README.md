@@ -1,6 +1,8 @@
 # Task Management System
 
-Bu proje, .NET 9.0 Web API backend ve Next.JS arayüzünden oluşan bir görev yönetim sistemidir.
+Bu proje, .NET 9.0 Web API backend ve modern bir frontend arayüzünden oluşan kapsamlı bir görev yönetim sistemidir.
+
+---
 
 ## 🛠 Kurulum ve Çalıştırma
 
@@ -19,6 +21,7 @@ Bu proje, .NET 9.0 Web API backend ve Next.JS arayüzünden oluşan bir görev y
     ```
 * **Erişim:** API `http://localhost:5271` adresinde çalışacaktır.
 
+---
 
 ### 2. Frontend Hazırlığı
 Arayüzü çalıştırmak için Node.js yüklü olmalıdır.
@@ -49,5 +52,5 @@ Sistemi aşağıdaki hazır hesaplarla test edebilirsiniz:
 
 ## 🚀 Teknolojiler
 - **Backend:** .NET 9.0 Web API / Entity Framework Core
-- **Frontend:** Node.js / npm
+- **Frontend:** Next.JS
 - **Portlar:** API (5271), UI (3000)

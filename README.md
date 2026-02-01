@@ -1,6 +1,6 @@
 # Task Management System
 
-Bu proje, .NET 9.0 Web API backend ve modern bir frontend arayüzünden oluşan kapsamlı bir görev yönetim sistemidir.
+Bu proje, .NET 9.0 Web API backend ve Next.JS arayüzüne sahip bir görev yönetim sistemidir.
 
 ---
 

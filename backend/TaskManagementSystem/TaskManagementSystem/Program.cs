@@ -3,13 +3,15 @@ using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using TaskManagementSystem.Context;
 using TaskManagementSystem.Services;
+using Syncfusion.Licensing;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JEaF5cXmRCf1FpRmJGdld5fUVHYVZUTXxaS00DNHVRdkdmWXldcHVVRGJeUERwW0BWYEk=");
 
 builder.Services.AddScoped<ExcelService>();
 builder.Services.AddScoped<WordService>();
+builder.Services.AddScoped<PdfService>();
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddDbContext<TaskManagementDbContext>();

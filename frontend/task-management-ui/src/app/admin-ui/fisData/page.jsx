@@ -162,6 +162,51 @@ export default function ExcelRead() {
     }
   };
 
+const exportFisDataAsPdf = async () => {
+  try {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      alert("Session not found. Please log in.");
+      return;
+    }
+
+    const res = await fetch("http://localhost:5271/api/Report/exportFisDataAsPdf", {
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (res.ok) 
+    {
+
+      const blob = await res.blob();
+      
+      const contentDisposition = res.headers.get("Content-Disposition");
+      const fileName = contentDisposition?.split("filename=")[1]?.replace(/"/g, "") || "FisDataReport.pdf";
+
+      const url = window.URL.createObjectURL(blob);
+      
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = fileName;
+      document.body.appendChild(link);
+      
+      link.click();
+      link.remove();
+      window.URL.revokeObjectURL(url);
+    } 
+    else 
+    {
+      const errorText = await res.text();
+      console.error("PDF Export Error:", errorText);
+      alert("Failed to download PDF file: " + errorText);
+    }
+  } catch (err) {
+    console.error("Network or Client Error:", err);
+    alert("Could not connect to the server.");
+  } 
+};
+
   return (
     <div>
       <div className="reports-row">
@@ -211,6 +256,17 @@ export default function ExcelRead() {
               className="btn-export blue"
               onClick={exportFisDataAsWord}
               >Export Word
+              </button>         
+            </div>
+        </div>
+           <div className="report-card">
+              <div className="report-card-title">
+              <h3>Export Fis Data As PDF</h3>    
+              <button
+              type="button"
+              className="btn-export blue"
+              onClick={exportFisDataAsPdf}
+              >Export Pdf
               </button>         
             </div>
         </div>

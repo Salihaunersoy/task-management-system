@@ -3,6 +3,7 @@ using DocumentFormat.OpenXml.Spreadsheet;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Syncfusion.Pdf.Interactive;
 using TaskManagementSystem.Context;
 using TaskManagementSystem.DTOs;
 using TaskManagementSystem.Models;
@@ -18,12 +19,14 @@ namespace TaskManagementSystem.Controllers
 		private readonly TaskManagementDbContext _context;
 		private readonly ExcelService            _excelService;
 		private readonly WordService             _wordService;
+		private readonly PdfService				 _pdfService;
 
-		public ReportController(TaskManagementDbContext context, ExcelService excelService, WordService wordService)
+		public ReportController(TaskManagementDbContext context, ExcelService excelService, WordService wordService, PdfService pdfService)
 		{
 			_context      = context;
 			_excelService = excelService;
-			_wordService = wordService;
+			_wordService  = wordService;
+			_pdfService   = pdfService;
 		}
 
 		[HttpPost("upload")]
@@ -157,6 +160,41 @@ namespace TaskManagementSystem.Controllers
 
 			return File(fileContent, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
 
+		}
+
+		[HttpGet("exportFisDataAsPdf")]
+		public async Task<ActionResult> ExportFisDataAsPdf()
+		{
+			string? userName = User.Identity?.Name;
+			if (string.IsNullOrEmpty(userName))
+				return Unauthorized(new { success = false, message = "Invalid token or user information not found." });
+
+			int totalCount = await _context.FisDatas.CountAsync();
+			if (totalCount == 0)
+				return BadRequest(new { success = false, message = "No data available for download." });
+
+			List<FisData> fisList = await _context.FisDatas
+				.AsNoTracking()
+				.OrderBy(f => f.FisId)
+				.ToListAsync();
+
+			byte[] fileContent = _pdfService.GeneratePdfReport(fisList);
+
+			string safeUserName = string.Join("_", userName.Split(Path.GetInvalidFileNameChars()));
+			string fileName = $"{safeUserName}_{DateTime.Now:dd-MM-yyyy_HH-mm}.pdf";
+
+			string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+			string folderPath = Path.Combine(desktopPath, "Exports");
+
+			if (!Directory.Exists(folderPath))
+				Directory.CreateDirectory(folderPath);
+
+			string filePath = Path.Combine(folderPath, fileName);
+			await System.IO.File.WriteAllBytesAsync(filePath, fileContent);
+
+			fisList.Clear();
+
+			return File(fileContent, "application/pdf", fileName);
 		}
 
 		[HttpGet("export")]

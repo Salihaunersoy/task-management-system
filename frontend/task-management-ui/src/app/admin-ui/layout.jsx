@@ -83,6 +83,7 @@ export default function AdminLayout({ children }) {
     { name: "Tasks"    , href: "/admin-ui/tasks"    , icon: "fa-solid fa-list-check"   },
     { name: "Users"    , href: "/admin-ui/users"    , icon: "fa-solid fa-users"        },
     { name: "Reports"  , href: "/admin-ui/reports"  , icon: "fa-solid fa-file-invoice" },
+    { name: "Fis Data" , href: "/admin-ui/fisData"  , icon: "fa-solid fa-file-invoice" },
   ]; 
 
   return (

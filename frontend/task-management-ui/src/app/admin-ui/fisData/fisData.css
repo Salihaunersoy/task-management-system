@@ -1,0 +1,218 @@
+.reports-header {
+  margin-bottom: 15px;
+}
+
+.reports-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #ffffff;
+  margin: 0 0 4px 0;
+  text-transform: uppercase;
+}
+
+.reports-subtitle {
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.reports-row {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.report-card {
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.04);
+  padding: 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  border: 1px solid #f0f0f0;
+  transition: box-shadow 0.25s, transform 0.25s;
+}
+
+.report-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.06), 0 12px 28px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+.card-spacer {
+  flex: 1;
+}
+
+.report-card-top {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.report-card-title p {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 3px 0 0 0;
+}
+
+button.btn-export {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 8px !important;
+  color: #fff !important;
+  border: none !important;
+  padding: 12px 20px !important;
+  border-radius: 10px !important;
+  font-size: 13px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: background 0.2s, transform 0.15s, box-shadow 0.2s !important;
+  width: 100% !important;
+  appearance: none !important;
+}
+
+button.btn-export.blue {
+  background: linear-gradient(135deg, #3b82f6, #2563eb) !important;
+  box-shadow: 0 2px 8px rgba(37, 99, 235, 0.25) !important;
+}
+
+button.btn-export.blue:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8) !important;
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.35) !important;
+  transform: translateY(-1px);
+}
+
+button.btn-export:disabled {
+  background: #d1d5db !important;
+  box-shadow: none !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+  opacity: 0.7;
+}
+
+button.btn-export i {
+  font-size: 14px;
+}
+
+/* ===== FIS DATA TABLE ===== */
+.fis-table-wrapper {
+  margin-top: 24px;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06), 0 6px 16px rgba(0, 0, 0, 0.04);
+  border: 1px solid #f0f0f0;
+  overflow: hidden;
+}
+
+.fis-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+
+.fis-table thead {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+}
+
+.fis-table thead th {
+  color: #fff;
+  font-weight: 600;
+  text-align: left;
+  padding: 16px 14px;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border: none;
+}
+
+.fis-table tbody tr {
+  border-bottom: 1px solid #f0f0f0;
+  transition: background 0.15s;
+}
+
+.fis-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.fis-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.fis-table tbody td {
+  padding: 14px;
+  color: #374151;
+  vertical-align: middle;
+}
+
+.fis-table tbody td:nth-child(7),
+.fis-table tbody td:nth-child(8) {
+  font-family: 'Consolas', 'Monaco', monospace;
+  text-align: right;
+  font-weight: 500;
+}
+
+/* Zebra striping */
+.fis-table tbody tr:nth-child(even) {
+  background: #fafbfc;
+}
+
+.fis-table tbody tr:nth-child(even):hover {
+  background: #f1f5f9;
+}
+
+/* ===== PAGINATION ===== */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px;
+  background: #f8fafc;
+  border-top: 1px solid #e5e7eb;
+}
+
+.pagination button {
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
+  color: #fff;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.pagination button:hover:not(:disabled) {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+}
+
+.pagination button:disabled {
+  background: #d1d5db;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: none;
+}
+
+.pagination span {
+  font-size: 14px;
+  font-weight: 500;
+  color: #6b7280;
+  background: #fff;
+  padding: 8px 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+}
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 1024px) {
+  .fis-table-wrapper {
+    overflow-x: auto;
+  }
+
+  .fis-table {
+    min-width: 900px;
+  }
+}

@@ -4,9 +4,12 @@ import { useState, useEffect } from "react";
 import "./reports.css";
 
 export default function ReportsPage() {
-  const [tasks, setTasks]     = useState([]);
-  const [users, setUsers]     = useState([]);
-  const [loading, setLoading] = useState({ users: false, tasks: false });
+  const [tasks       , setTasks]        = useState([]);
+  const [users       , setUsers]        = useState([]);
+  const [loading     , setLoading]      = useState({ users: false, tasks: false });4
+  const [selectedFile, setSelectedFile] = useState(null);
+  const [uploading   , setUploading]    = useState(false);
+  const [uploadStatus, setUploadStatus] = useState({ type: "", message: "" });
 
   const [chartOptions, setChartOptions] = useState({
     statusChart     : false,
@@ -86,6 +89,49 @@ export default function ReportsPage() {
       alert("Excel export failed.");
     }
     setLoading((p) => ({ ...p, tasks: false }));
+  };
+
+  const uploadExcelFile = async  () => {
+
+    if (!selectedFile) {
+      alert("Lütfen önce bir dosya seçin.");
+      return;
+    }
+
+    setUploading(true);
+    setUploadStatus({ type: "info", message: "Dosya işleniyor, lütfen bekleyin..." });
+
+    const formData = new FormData();
+    formData.append("file", selectedFile);
+
+    try {
+      const token = localStorage.getItem("token");
+      const res   = await fetch("http://localhost:5271/api/Report/upload", {
+        method: "POST",
+        body: formData,
+        headers: {
+          "Authorization": `Bearer ${token}`
+        },
+    });
+
+    if (res.ok) 
+    {
+      const result = await res.json();
+      alert(`Success! ${result.count} rows have been saved to the database.`);
+      setSelectedFile(null);
+    } else 
+    {
+      const errorText = await res.text();
+      alert("Upload Failed: " + errorText);
+    }
+    
+  } catch (err) {
+    console.error("Upload error:", err);
+    alert("System Error: Could not reach the server.");
+  } finally {
+    setUploading(false);
+  }
+
   };
 
   const selectedChartCount = Object.values(chartOptions).filter(Boolean).length;
@@ -243,6 +289,31 @@ export default function ReportsPage() {
             <i className="fa-solid fa-file-excel"></i>
             {loading.tasks ? "Exporting..." : "Export Tasks"}
           </button>
+        </div>
+
+        <div className="report-card">
+              <div className="report-card-title">
+              <h3>Add Excel Fis Data Table</h3>             
+              <input
+              type="file"
+              accept=".xlsx,.xls"
+              onChange={(e) => setSelectedFile(e.target.files[0])}
+              />
+              <button
+              type="button"
+              className="btn-export blue"
+              onClick={uploadExcelFile}
+              >
+              Dosyayı Yükle</button>
+            </div>
+        </div>
+
+         <div className="report-card">
+              <div className="report-card-title">
+              <h3>List Excel Fis Data Table</h3>    
+              <button>
+              </button>         
+            </div>
         </div>
       </div>
     </div>

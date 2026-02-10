@@ -20,7 +20,7 @@ namespace TaskManagementSystem.Controllers
 		public AuthController(TaskManagementDbContext context, IConfiguration config)
 		{
 			_context = context;
-			_config = config;
+			_config  = config;
 		}
 
 		[HttpPost("login")]
@@ -51,23 +51,23 @@ namespace TaskManagementSystem.Controllers
 
 		private string GenerateJwtToken(User user)
 		{
-			var key     = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtConfig:Key"]!));
-			var creds   = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-			var expires = DateTime.Now.AddMinutes(double.Parse(_config["JwtConfig:ExpirationInMinutes"]!));
+			SymmetricSecurityKey key     = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_config["JwtConfig:Key"]!));
+			SigningCredentials   creds   = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+			DateTime             expires = DateTime.Now.AddMinutes(double.Parse(_config["JwtConfig:ExpirationInMinutes"]!));
 
-			var claims = new[]
+			Claim[] claims = new[]
 			{
-				new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
-				new Claim(ClaimTypes.Email, user.Email),
-				new Claim(ClaimTypes.Name, $"{user.Name} {user.Surname}"),
-				new Claim(ClaimTypes.Role, user.RoleId == 0 ? "Admin" : "User")
+				new Claim(ClaimTypes.NameIdentifier , user.UserId.ToString()),
+				new Claim(ClaimTypes.Email			, user.Email),
+				new Claim(ClaimTypes.Name			, $"{user.Name} {user.Surname}"),
+				new Claim(ClaimTypes.Role			, user.RoleId == 0 ? "Admin" : "User")
 			};
 
-			var token = new JwtSecurityToken(
-				issuer:   _config["JwtConfig:Issuer"],
-				audience: _config["JwtConfig:Audience"],
-				claims:   claims,
-				expires:  expires,
+			JwtSecurityToken token = new JwtSecurityToken(
+				issuer			  : _config["JwtConfig:Issuer"],
+				audience		  : _config["JwtConfig:Audience"],
+				claims	          : claims,
+				expires			  : expires,
 				signingCredentials: creds
 			);
 

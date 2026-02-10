@@ -10,6 +10,20 @@ namespace TaskManagementSystem.Services
 		{
 			PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
+			// Başlık satırı ekle
+			Row headerRow = new Row();
+			foreach (PropertyInfo prop in properties)
+			{
+				Cell headerCell = new Cell()
+				{
+					CellValue = new CellValue(prop.Name),
+					DataType  = CellValues.String
+				};
+				headerRow.Append(headerCell);
+			}
+			sheetData.Append(headerRow);
+
+			// Veri satırları
 			foreach (T item in data)
 			{
 				Row newRow = new Row();

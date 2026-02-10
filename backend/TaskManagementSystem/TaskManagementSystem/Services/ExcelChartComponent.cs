@@ -96,7 +96,7 @@ namespace TaskManagementSystem.Services
 				barChart.Append(new C.BarGrouping () { Val = C.BarGroupingValues.Stacked });
 				barChart.Append(new C.VaryColors  () { Val = false });
 
-				string[] categories = chartReq.Data.Keys.ToArray();
+				string[] categories = chartReq.BarData.Keys.ToArray();
 
 				HashSet<string> allStatuses = new HashSet<string>();
 				foreach (var userStatuses in chartReq.BarData.Values)

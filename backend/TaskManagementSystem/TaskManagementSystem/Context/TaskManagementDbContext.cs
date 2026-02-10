@@ -7,8 +7,9 @@ namespace TaskManagementSystem.Context
 {
 	public class TaskManagementDbContext : DbContext
 	{
-		public DbSet<User> Users { get; set; }
-		public DbSet<Task> Tasks { get; set; }
+		public DbSet<User>    Users    { get; set; }
+		public DbSet<Task>    Tasks    { get; set; }
+		public DbSet<FisData> FisDatas { get; set; }
 
 		protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 		{
@@ -18,6 +19,21 @@ namespace TaskManagementSystem.Context
 		protected override void OnModelCreating(ModelBuilder modelBuilder)
 		{
 			base.OnModelCreating(modelBuilder);
+
+			modelBuilder.Entity<FisData>(entity =>
+			{
+				entity.HasKey  (f => f.FisId);
+				entity.Property(f => f.FisId).ValueGeneratedOnAdd();
+
+				entity.Property(f => f.FisNo)    .IsRequired().HasMaxLength(11);
+				entity.Property(f => f.HesapKodu).IsRequired().HasMaxLength(3);
+				entity.Property(f => f.HesapAdi) .IsRequired().HasMaxLength(200);
+				entity.Property(f => f.FaturaNo) .IsRequired().HasMaxLength(15);
+				entity.Property(f => f.Borc)     .HasPrecision(18, 2);
+				entity.Property(f => f.Alacak)   .HasPrecision(18, 2);
+				entity.Property(f => f.Aciklama) .IsRequired().HasMaxLength(500);
+				entity.Property(f => f.FisTarih) .IsRequired();
+			});
 
 			modelBuilder.Entity<User>(entity =>
 			{

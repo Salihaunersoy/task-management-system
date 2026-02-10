@@ -1,8 +1,11 @@
-﻿using Microsoft.AspNetCore.Authorization;
+﻿using DocumentFormat.OpenXml.Packaging;
+using DocumentFormat.OpenXml.Spreadsheet;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using TaskManagementSystem.Context;
 using TaskManagementSystem.DTOs;
+using TaskManagementSystem.Models;
 using TaskManagementSystem.Services;
 
 namespace TaskManagementSystem.Controllers
@@ -14,11 +17,146 @@ namespace TaskManagementSystem.Controllers
 	{
 		private readonly TaskManagementDbContext _context;
 		private readonly ExcelService            _excelService;
+		private readonly WordService             _wordService;
 
-		public ReportController(TaskManagementDbContext context, ExcelService excelService)
+		public ReportController(TaskManagementDbContext context, ExcelService excelService, WordService wordService)
 		{
 			_context      = context;
 			_excelService = excelService;
+			_wordService = wordService;
+		}
+
+		[HttpPost("upload")]
+		public async Task<IActionResult> UploadExcel(IFormFile file)
+		{
+			if (file == null || file.Length == 0) return BadRequest("Dosya seçilmedi.");
+
+			try
+			{
+				List<FisData> fisList = ExcelReadFisData.ReadFisData(file);
+
+				if (fisList == null || !fisList.Any())
+					return BadRequest("Dosya okundu ancak işlenecek veri bulunamadı.");
+
+				_context.FisDatas.RemoveRange(_context.FisDatas); //çift kayıt olmasın
+
+				await _context.FisDatas.AddRangeAsync(fisList); 
+
+				await _context.SaveChangesAsync();
+
+				return Ok(new
+				{
+					Message = "Veriler başarıyla kaydedildi.",
+					Count = fisList.Count
+				});
+			}
+			catch (Exception ex)
+			{
+				return StatusCode(500, $"Sunucu hatası: {ex.Message}");
+			}
+		}
+
+		[HttpGet("listFisData")]
+		public async Task<IActionResult> GetFisData([FromQuery] int page = 1,[FromQuery] int pageSize = 15)
+		{
+			if (page < 1) page = 1;
+			if (pageSize < 1 || pageSize > 100) pageSize = 15;
+
+			int totalItems = await _context.FisDatas.CountAsync();
+			int totalPages = (int)Math.Ceiling(totalItems / (double)pageSize);
+
+			List<FisData> items = await _context.FisDatas
+				.AsNoTracking()
+				.OrderByDescending(f => f.FisId)
+				.Skip((page - 1) * pageSize)
+				.Take(pageSize)
+				.ToListAsync();
+
+			return Ok(new
+			{
+				success = true,
+				data = new
+				{
+					items,
+					page,
+					pageSize,
+					totalItems,
+					totalPages,
+					hasPrevious = page > 1,
+					hasNext = page < totalPages
+				}
+			});
+		}
+
+		[HttpGet("exportFisData")]
+		public async Task<IActionResult> ExportFisData()
+		{
+			string? userName = User.Identity?.Name;
+			if (string.IsNullOrEmpty(userName))
+				return Unauthorized(new { success = false, message = "Invalid token or user information not found." });
+
+			int totalCount = await _context.FisDatas.CountAsync();
+			if (totalCount == 0)
+				return BadRequest(new { success = false, message = "No data available for download." });
+
+			List<FisData> fisList = await _context.FisDatas
+				.AsNoTracking()
+				.OrderBy(f => f.FisId)
+				.ToListAsync();
+
+			byte[] fileContent = _excelService.GenerateReport(fisList, null);
+
+			string safeUserName = string.Join("_", userName.Split(Path.GetInvalidFileNameChars()));
+			string fileName     = $"{safeUserName}_{DateTime.Now:dd-MM-yyyy_HH-mm}.xlsx";
+
+			string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+			string folderPath  = Path.Combine(desktopPath, "Exports");
+
+			if (!Directory.Exists(folderPath))
+				Directory.CreateDirectory(folderPath);
+
+			string filePath = Path.Combine(folderPath, fileName);
+			await System.IO.File.WriteAllBytesAsync(filePath, fileContent);
+
+			fisList.Clear();
+
+			return File(fileContent, "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileName);
+		}
+
+		[HttpGet("exportFisDataAsWord")]
+		public async Task<IActionResult> ExportFisDataAsWord()
+		{
+			string? userName = User.Identity?.Name;
+			if (string.IsNullOrEmpty(userName))
+				return Unauthorized(new { success = false, message = "Invalid token or user information not found." });
+
+			int totalCount = await _context.FisDatas.CountAsync();
+			if (totalCount == 0)
+				return BadRequest(new { success = false, message = "No data available for download." });
+
+			List<FisData> fisList = await _context.FisDatas
+				.AsNoTracking()
+				.OrderBy(f => f.FisId)
+				.ToListAsync();
+
+			byte[] fileContent = _wordService.GenerateWordReport(fisList);
+
+			string safeUserName = string.Join("_", userName.Split(Path.GetInvalidFileNameChars()));
+			string fileName = $"{safeUserName}_{DateTime.Now:dd-MM-yyyy_HH-mm}.docx";
+
+			string desktopPath = Environment.GetFolderPath(Environment.SpecialFolder.Desktop);
+			string folderPath = Path.Combine(desktopPath, "Exports");
+
+			if (!Directory.Exists(folderPath))
+				Directory.CreateDirectory(folderPath);
+
+			string filePath = Path.Combine(folderPath, fileName);
+			await System.IO.File.WriteAllBytesAsync(filePath, fileContent);
+
+			fisList.Clear();
+
+			return File(fileContent, "application/vnd.openxmlformats-officedocument.wordprocessingml.document", fileName);
+
 		}
 
 		[HttpGet("export")]

@@ -10,7 +10,12 @@
       "Bash(cmd /c \"tasklist /FI \"\"IMAGENAME eq TaskManagementSystem.exe\"\"\")",
       "Bash(powershell -Command:*)",
       "Bash(ls -la \"C:\\\\Users\\\\excalibur\\\\Desktop\\\\task-management-system\\\\frontend\\\\task-management-ui\\\\src\\\\app\\\\admin-ui\"\" 2>&1 || echo \"Directory listing failed \")",
-      "Bash(dotnet run)"
+      "Bash(dotnet run)",
+      "Bash(tree:*)",
+      "Bash(dotnet ef migrations:*)",
+      "Bash(dotnet ef database update:*)",
+      "Bash(sqlcmd:*)",
+      "Bash(curl:*)"
     ]
   }
 }

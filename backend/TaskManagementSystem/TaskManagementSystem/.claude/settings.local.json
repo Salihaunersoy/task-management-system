@@ -15,7 +15,8 @@
       "Bash(dotnet ef migrations:*)",
       "Bash(dotnet ef database update:*)",
       "Bash(sqlcmd:*)",
-      "Bash(curl:*)"
+      "Bash(curl:*)",
+      "Bash(dir:*)"
     ]
   }
 }

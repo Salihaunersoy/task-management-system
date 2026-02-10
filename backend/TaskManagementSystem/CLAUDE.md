@@ -4,184 +4,95 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-TaskManagementSystem is an ASP.NET Core 9.0 Web API project built for managing users and tasks. The system includes JWT authentication, CRUD operations, search/filtering capabilities, and Excel export functionality using OpenXML.
+ASP.NET Core 9.0 Web API for task management with JWT auth, role-based access (Admin/User), CRUD operations, and document export (Excel/Word/PDF). Frontend is a Next.js app at `../../frontend/task-management-ui/` running on `http://localhost:3000`.
 
-## Technology Stack
+## Build and Run
 
-- **Framework**: ASP.NET Core 9.0 (Web API)
-- **Target Framework**: .NET 9.0
-- **Database**: Entity Framework Core (database provider to be configured)
-- **Authentication**: JWT (JSON Web Tokens)
-- **Excel Export**: OpenXML (DocumentFormat.OpenXml)
-- **API Documentation**: OpenAPI/Swagger
+All commands run from the project directory (`TaskManagementSystem/TaskManagementSystem/`):
 
-## Project Structure
+```bash
+dotnet build                              # Build
+dotnet run                                # Run (HTTP: localhost:5271, HTTPS: localhost:7129)
+dotnet watch run                          # Run with hot reload
+```
+
+Solution file is one level up: `../TaskManagementSystem.sln`
+
+### Database (SQL Server)
+
+Connection: `Server=.;Database=TaskManagementDb;Trusted_Connection=True;TrustServerCertificate=True`
+
+```bash
+dotnet ef migrations add <Name>           # New migration
+dotnet ef database update                 # Apply migrations
+```
+
+Data is seeded automatically via `Seeds/UserSeed.cs` (12 users) and `Seeds/TaskSeed.cs` (40 tasks).
+
+## Architecture
+
+Controllers → Services → DbContext (no repository pattern). Services are registered in `Program.cs` via DI.
+
+### Project Layout
 
 ```
 TaskManagementSystem/
-├── Models/           # Entity models (User, Task)
-├── Controllers/      # API controllers
-├── Services/         # Business logic layer
-├── Data/            # DbContext and database configuration
-├── DTOs/            # Data Transfer Objects
-├── Repositories/    # Data access layer (optional pattern)
-├── Middleware/      # Custom middleware (auth, error handling)
-└── Program.cs       # Application entry point
+├── Controllers/      # AuthController, UserController, TaskController, ReportController
+├── Context/          # TaskManagementDbContext (EF Core, SQL Server)
+├── Models/           # User, Task, FisData entities
+├── DTOs/             # UserDTO, CreateUserDTO, TaskDTO, TaskStatusDTO, LoginDTO, LoginResponseDTO
+├── Services/         # ExcelService, WordService, PdfService
+├── Seeds/            # UserSeed, TaskSeed (test data)
+├── Helpers/          # ExcelHelpers (cell parsing utilities)
+├── Fonts/            # arial.ttf (used by PdfService)
+├── Migrations/       # EF Core migrations
+└── Program.cs        # Entry point, JWT config, CORS, DI setup
 ```
 
-## Core Entities
+### Entities
 
-### User Entity
-- User authentication and management
-- Properties: Id, Username, Email, Password (hashed), Role, etc.
+- **User**: `UserId`, `RoleId` (0=Admin, 1=User), `Name`, `Surname`, `Email`, `PasswordHash`, `UserCreatedAt`
+- **Task**: `TaskId`, `Title`, `Description`, `Status` (ToDo/InProgress/Testing/Done/OnHold), `Priority` (Low/Medium/High/Critical), `AssignedUserId`, `CreatedByAdminId`, `DueDate`, `TaskCreatedAt`
+- **FisData**: Financial/accounting records with `FisNo`, `FisTarih`, `HesapKodu`, `HesapAdi`, `Aciklama`, `FaturaNo`, `Borc`, `Alacak`
 
-### Task Entity
-- Task management with CRUD operations
-- Properties: Id, Title, Description, Status, Priority, AssignedUserId, CreatedDate, DueDate, etc.
-- Relationship: Many tasks to one user (assigned user)
+### API Routes
 
-## Development Commands
+| Route | Auth | Description |
+|-------|------|-------------|
+| `POST /api/auth/login` | None | Returns JWT token + user info |
+| `GET/POST/PUT/DELETE /api/users` | Admin | User CRUD (GET by id allows any authenticated user) |
+| `GET/POST/PUT/DELETE /api/tasks` | Admin for CUD, any auth for Read | Task CRUD |
+| `PUT /api/tasks/{id}/status` | Any auth | Update task status only |
+| `POST /api/report/upload` | Admin | Upload Excel file (FisData) |
+| `GET /api/report/exportFisData` | Admin | Export FisData as .xlsx |
+| `GET /api/report/exportFisDataAsWord` | Admin | Export FisData as .docx |
+| `GET /api/report/exportFisDataAsPdf` | Admin | Export FisData as .pdf |
+| `GET /api/report/listFisData` | Admin | Paginated FisData list (query: page, pageSize) |
+| `GET /api/report/export` | Admin | Export tasks as .xlsx with optional charts (query: statusChart, priorityChart, taskByUserChart) |
 
-### Build and Run
-```bash
-# Build the solution
-dotnet build
+### JWT Configuration
 
-# Run the application
-dotnet run
+Claims: `NameIdentifier` (UserId), `Email`, `Name` (full name), `Role` ("Admin" or "User"). Token expiry: 1440 minutes (24h). CORS allows `http://localhost:3000`.
 
-# Run with hot reload (watch mode)
-dotnet watch run
+### Document Export Services
 
-# Build for release
-dotnet build -c Release
-```
+- **ExcelService**: Generic `GenerateReport<T>()` using OpenXML with optional doughnut/bar charts via `ChartRequest`
+- **WordService**: Generates .docx tables from FisData using OpenXML
+- **PdfService**: Generates PDF using Syncfusion.Pdf (requires `Fonts/arial.ttf` for Turkish character support)
+- **ExcelReadFisData**: Reads uploaded Excel files into FisData objects
+- **ExcelTableComponent/ExcelChartComponent**: Static helpers for OpenXML table and chart generation
 
-### Database Management
-```bash
-# Add a new migration
-dotnet ef migrations add <MigrationName>
+### Key Dependencies
 
-# Update database
-dotnet ef database update
+- `Microsoft.EntityFrameworkCore.SqlServer` - Database
+- `Microsoft.AspNetCore.Authentication.JwtBearer` - Auth
+- `DocumentFormat.OpenXml` - Excel/Word generation
+- `Syncfusion.Pdf.Net.Core` - PDF generation (license key set in Program.cs)
+- `BCrypt.Net-Next` - Available but not currently used for password hashing
 
-# Remove last migration
-dotnet ef migrations remove
+### Design Constraints
 
-# Drop database
-dotnet ef database drop
-```
-
-### Package Management
-```bash
-# Add package
-dotnet add package <PackageName>
-
-# Restore packages
-dotnet restore
-```
-
-### Testing
-```bash
-# Run all tests (when test project is added)
-dotnet test
-
-# Run specific test
-dotnet test --filter "FullyQualifiedName~Namespace.ClassName.MethodName"
-```
-
-## Key Implementation Requirements
-
-### Authentication & Authorization
-- JWT token-based authentication
-- Login endpoint returns access token
-- Protected endpoints require valid JWT token
-- Token validation middleware configured in Program.cs
-
-### API Endpoints Structure
-- **Auth**: `/api/auth/login`, `/api/auth/register`
-- **Users**: `/api/users` - CRUD operations for users
-- **Tasks**: `/api/tasks` - CRUD operations for tasks
-- **Reports**: `/api/reports/export` - Excel export functionality
-
-### Search & Filtering
-- All search and filter operations must be performed at the database level (server-side) using LINQ/EF Core queries
-- Avoid client-side filtering for performance and scalability
-- Implement query parameters for filtering (status, priority, date ranges, assigned user, etc.)
-
-### Excel Export
-- Use DocumentFormat.OpenXml library for Excel generation
-- Export tasks and related data to .xlsx format
-- Implement in a dedicated service/controller for reporting
-
-### Data Seeding
-- Create seed data for development/demonstration purposes
-- Include sample users and tasks
-- Implement in DbContext.OnModelCreating or separate seeder class
-
-## Architecture Patterns
-
-### Layered Architecture
-The application follows a layered architecture:
-1. **Controllers**: Handle HTTP requests/responses, route to services
-2. **Services**: Contain business logic, orchestrate operations
-3. **Repositories**: Data access abstraction (if pattern is used)
-4. **Data Layer**: EF Core DbContext and entity configurations
-
-### Dependency Injection
-- Register services in Program.cs using builder.Services
-- Use constructor injection in controllers and services
-- Prefer interfaces for testability (IUserService, ITaskService, etc.)
-
-## Configuration
-
-### appsettings.json Structure
-```json
-{
-  "ConnectionStrings": {
-    "DefaultConnection": "..."
-  },
-  "JwtSettings": {
-    "Secret": "...",
-    "Issuer": "...",
-    "Audience": "...",
-    "ExpirationInMinutes": 60
-  },
-  "Logging": { ... },
-  "AllowedHosts": "*"
-}
-```
-
-## API Response Format
-
-Standardize API responses:
-```json
-{
-  "success": true/false,
-  "data": { ... },
-  "message": "...",
-  "errors": [ ... ]
-}
-```
-
-## Error Handling
-
-- Implement global exception handling middleware
-- Return consistent error responses
-- Log errors appropriately
-- Use appropriate HTTP status codes (200, 201, 400, 401, 404, 500)
-
-## Security Considerations
-
-- Password hashing using BCrypt or ASP.NET Core Identity password hasher
-- Validate input data using Data Annotations or FluentValidation
-- Implement authorization policies for role-based access
-- Secure sensitive configuration (JWT secrets, connection strings)
-
-## Solution File Location
-
-The solution file is located at: `../TaskManagementSystem.sln` (parent directory)
-
-## Working Directory
-
-The main project directory is: `TaskManagementSystem/` (subdirectory of solution root)
+- All search/filter operations must use server-side LINQ/EF Core queries, not client-side filtering
+- Task default status is "ToDo", default priority is "Medium"
+- Foreign keys on Task use `DeleteBehavior.Restrict`
+- `UserCreatedAt` defaults via SQL `GETDATE()`

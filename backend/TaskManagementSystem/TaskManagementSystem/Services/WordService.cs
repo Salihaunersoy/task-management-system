@@ -30,11 +30,19 @@ namespace TaskManagementSystem.Services
 							new InsideHorizontalBorder { Val = BorderValues.Single, Size = 4 },
 							new InsideVerticalBorder   { Val = BorderValues.Single, Size = 4 }
 						),
-						new TableLayout { Type = TableLayoutValues.Autofit }
+						new TableLayout { Type = TableLayoutValues.Fixed },
+						new TableWidth  { Type = TableWidthUnitValues.Dxa, Width = "15398" }
 					);
 					table.Append(tableProps);
 
 					PropertyInfo[] properties = typeof(FisData).GetProperties(BindingFlags.Public | BindingFlags.Instance);
+
+					TableGrid tableGrid = new TableGrid();
+					for (int i = 0; i < properties.Length; i++)
+					{
+						tableGrid.Append(new GridColumn { Width = "1711" });
+					}
+					table.Append(tableGrid);
 
 					TableRow headerRow = new TableRow();
 					foreach (PropertyInfo prop in properties)
@@ -42,7 +50,7 @@ namespace TaskManagementSystem.Services
 						TableCell cell = new TableCell();
 
 						TableCellProperties cellProperties = new TableCellProperties(
-							new TableCellWidth { Type = TableWidthUnitValues.Auto }
+							new TableCellWidth { Type = TableWidthUnitValues.Dxa, Width = "1711" }
 						);
 						cell.Append(cellProperties);
 
@@ -74,6 +82,9 @@ namespace TaskManagementSystem.Services
 							};
 							dataRow.Append(
 								new TableCell(
+									new TableCellProperties(
+										new TableCellWidth { Type = TableWidthUnitValues.Dxa, Width = "1711" }
+									),
 									new Paragraph(
 										new Run(
 											new Text(cellValue)

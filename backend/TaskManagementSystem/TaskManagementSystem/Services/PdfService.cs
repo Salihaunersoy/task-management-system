@@ -15,10 +15,10 @@ namespace TaskManagementSystem.Services
 			document.PageSettings.Orientation = PdfPageOrientation.Portrait;
 			document.PageSettings.Margins.All = 15;
 
-			PdfPage page = document.Pages.Add();
-			PdfGrid pdfGrid = new PdfGrid();
+			PdfPage page    = document.Pages.Add();
+			PdfGrid pdfGrid = new PdfGrid();  //entity’nin property adlarını otomatik kolon başlığı yapar.!!!
 
-			pdfGrid.DataSource = data;
+			pdfGrid.DataSource   = data;
 			pdfGrid.RepeatHeader = true;
 
 			string fontPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.Fonts), "arial.ttf");

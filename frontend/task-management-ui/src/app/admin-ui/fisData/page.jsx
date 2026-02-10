@@ -60,7 +60,7 @@ export default function ExcelRead() {
     setIsListLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await fetch(`http://localhost:5271/api/Report/listFisData?page=${page}&pageSize=100`, {
+      const res   = await fetch(`http://localhost:5271/api/Report/listFisData?page=${page}&pageSize=100`, {
         headers: {
           "Authorization": `Bearer ${token}`
         }
@@ -76,11 +76,11 @@ export default function ExcelRead() {
       } else {
         const errorText = await res.text();
         console.log("API Error:", res.status, errorText);
-        alert(`Veriler yüklenemedi. Status: ${res.status}`);
+        alert(`Failed Status: ${res.status}`);
       }
     } catch (err) {
       console.error("Fetch error:", err);
-      alert("Sunucuya bağlanılamadı.");
+      alert("Could not connect to the server.");
     } finally {
       setIsListLoading(false);
     }
